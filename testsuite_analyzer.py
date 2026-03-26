@@ -11,7 +11,6 @@ def analyze_logs():
 
     log_files = [f for f in os.listdir(log_dir) if f.endswith('.log')]
     
-    # --- LIVE HARDWARE DISCOVERY ---
     device_name = "Unknown"
     gfx_arch = "Unknown"
     gfx_arch_code = "unknown"

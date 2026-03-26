@@ -2,8 +2,7 @@ import torch
 import time
 
 def run():
-    print(">> Testing Advanced Indexing (Gather) Verbose...")
-    # Simulate a 2048-token KV Cache
+    print(">> Testing Advanced Indexing (Gather)...")
     tokens, dim = 2048, 64
     print(f"Config: 16 Heads, {tokens} Tokens, Dim={dim} | Mode: FP32")
     
@@ -14,7 +13,6 @@ def run():
         print("Executing Paged-Gather Indexing...")
         torch.cuda.synchronize()
         start = time.time()
-        # Expand indices to match the 64-dim hidden states
         idx_exp = indices.unsqueeze(-1).expand(-1, -1, -1, dim)
         out = torch.gather(cache, 2, idx_exp)
         torch.cuda.synchronize()

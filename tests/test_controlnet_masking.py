@@ -1,24 +1,22 @@
 import torch
 
 def run():
-    print(">> Testing Masked Tensor Ops (ControlNet/Inpaint Logic) Verbose...")
-    # Simulate a high-res latent mask
+    print(">> Testing Masked Tensor Ops (ControlNet/Inpaint Logic)...")
     shape = [1, 4, 128, 128]
     print(f"Config: Shape={shape} | Mode: FP16 + Boolean Masking")
     
     try:
         latents = torch.randn(*shape, device="cuda", dtype=torch.float16)
-        mask = (torch.rand(*shape, device="cuda") > 0.8) # 20% masked
+        mask = (torch.rand(*shape, device="cuda") > 0.8)
         
         print(f"Input Stats - Active Pixels: {mask.sum().item()} / {mask.numel()}")
 
         print("\n--- Executing Masked Fill & Blending ---")
         torch.cuda.synchronize()
-        # Simulate inpainting: Replace masked areas with noise
         noise = torch.randn_like(latents)
         out = latents.clone()
-        out.masked_fill_(mask, 0.0) # Zero out
-        out += (noise * mask.float()) # Inject noise into mask
+        out.masked_fill_(mask, 0.0)
+        out += (noise * mask.float())
         torch.cuda.synchronize()
 
         has_nan = torch.isnan(out).any().item()

@@ -1,7 +1,7 @@
 import torch
 
 def run():
-    print(">> Testing VRAM Overflow to System Shared Memory Verbose...")
+    print(">> Testing VRAM Overflow to System Shared Memory...")
     print("Config: Target=32GB | Mode: Shared/Swap Mapping")
     
     try:
@@ -11,15 +11,13 @@ def run():
         tensors = []
         print("\n--- Mapping 4GB Chunks to System Swap ---")
         for i in range(8):
-            # 1 billion float32 elements = 4GB
             t = torch.ones((1024, 1024, 1024), device="cuda", dtype=torch.float32)
-            t *= (i + 1) # Force physical page mapping
+            t *= (i + 1)
             tensors.append(t)
             print(f" - Chunk {i+1}/8 Validated | Active: {(i+1)*4}GB")
         
         torch.cuda.synchronize()
         
-        # Data integrity check across swap boundaries
         val_start = tensors[0][0,0,0].item()
         val_end = tensors[-1][0,0,0].item()
         sum_check = val_start + val_end

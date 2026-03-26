@@ -2,7 +2,7 @@ import torch
 import time
 
 def run():
-    print(">> Testing Multi-Stream Concurrency (Race Condition Stress) Verbose...")
+    print(">> Testing Multi-Stream Concurrency (Race Condition Stress)...")
     num_streams = 4
     size = 4096
     print(f"Config: {num_streams} Concurrent Streams | {size}x{size} GEMM | Mode: FP16")
@@ -22,11 +22,9 @@ def run():
                     b = torch.randn(size, size, device="cuda")
                     results.append(torch.matmul(a, b))
         
-        # Wait for all streams to finish
         for s in streams: s.synchronize()
         latency = (time.time() - start) * 1000
 
-        # Quality Check
         has_nan = any(torch.isnan(r).any().item() for r in results)
         
         print("Output Statistics:")

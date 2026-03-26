@@ -2,8 +2,7 @@ import torch
 import time
 
 def run():
-    print(">> Testing Model Context Switching (VRAM Purge) Verbose...")
-    # Simulate Unet (2GB) and VAE (500MB)
+    print(">> Testing Model Context Switching (VRAM Purge)...")
     config = "Unet_Sim=2GB, VAE_Sim=500MB | Mode: FP16"
     print(f"Config: {config}")
     
@@ -12,21 +11,17 @@ def run():
         initial_mem = torch.cuda.memory_allocated() / 1e6
         print(f"Initial Baseline VRAM: {initial_mem:.2f} MB")
 
-        # --- STEP 1: Load Large "Unet" ---
         print("\n--- Loading Simulated Unet (2GB) ---")
-        # 1 billion float16 = 2GB
         unet = torch.randn(1024, 1024, 1024, device="cuda", dtype=torch.float16)
         torch.cuda.synchronize()
         mid_mem = torch.cuda.memory_allocated() / 1e6
         print(f" - Unet Loaded | Current VRAM: {mid_mem:.2f} MB")
 
-        # --- STEP 2: Switch Context (The ComfyUI "Purge") ---
         print("\n--- Purging Unet & Loading VAE + CLIP ---")
         del unet
         torch.cuda.empty_cache()
         torch.cuda.synchronize()
         
-        # Simulate VAE/CLIP allocation
         vae = torch.randn(256, 1024, 1024, device="cuda", dtype=torch.float16)
         torch.cuda.synchronize()
         
@@ -43,7 +38,6 @@ def run():
             print("❌ Error: Memory corruption during context switch.")
             return False
 
-        # Verify the memory actually dropped from the 2GB peak
         if final_mem >= mid_mem:
             print("❌ Error: VRAM Failed to de-allocate during switch.")
             return False

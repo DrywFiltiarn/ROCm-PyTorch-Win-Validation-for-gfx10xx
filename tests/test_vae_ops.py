@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 
 def run():
-    print(">> Testing VAE Operations (GroupNorm + Upsample) Verbose...")
+    print(">> Testing VAE Operations (GroupNorm + Upsample)...")
     channels, res = 512, 64
     print(f"Config: GroupNorm(32, {channels}) | Res: {res} | Mode: FP16")
     

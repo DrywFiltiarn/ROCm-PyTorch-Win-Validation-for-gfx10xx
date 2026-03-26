@@ -3,8 +3,7 @@ from torchvision.transforms import functional as F
 import time
 
 def run():
-    print(">> Testing Torchvision Image Kernels Verbose...")
-    # Simulate a 4K frame resize to 1024 (Standard for high-res fix)
+    print(">> Testing Torchvision Image Kernels...")
     print("Config: 4K Raw -> 1024x1024 Bilinear Resize + 45deg Rotate")
     
     try:

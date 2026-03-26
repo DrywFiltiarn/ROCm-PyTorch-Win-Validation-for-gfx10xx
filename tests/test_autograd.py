@@ -1,7 +1,7 @@
 import torch
 
 def run():
-    print(">> Testing Autograd Engine & Backprop Chain Verbose...")
+    print(">> Testing Autograd Engine & Backprop Chain...")
     print("Config: Matrix 4096^2 | Mode: FP32 Gradient Tracking")
     try:
         x = torch.randn(4096, 4096, device="cuda", requires_grad=True)

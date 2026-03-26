@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 
 def run():
-    print(">> Testing CLIP Transformer (LayerNorm) Verbose...")
-    dim = 768 # CLIP-L hidden dimension
+    print(">> Testing CLIP Transformer (LayerNorm)...")
+    dim = 768
     print(f"Config: Dim={dim} (CLIP-L Standard) | Mode: FP16")
 
     try:

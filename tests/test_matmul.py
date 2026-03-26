@@ -2,7 +2,7 @@ import torch
 import time
 
 def run():
-    print(">> Testing Matrix Multiplication (GEMM) Performance Verbose...")
+    print(">> Testing Matrix Multiplication (GEMM) Performance...")
     size = 8192
     print(f"Config: {size}x{size} Matrix | Mode: FP16")
     
@@ -10,7 +10,6 @@ def run():
         a = torch.randn(size, size, device="cuda", dtype=torch.float16)
         b = torch.randn(size, size, device="cuda", dtype=torch.float16)
         
-        # Input Telemetry
         print(f"Input Stats - A Mean: {a.mean().item():.4f} | B Mean: {b.mean().item():.4f}")
         print(f"VRAM Allocated: {torch.cuda.memory_allocated()/1e9:.2f} GB")
         

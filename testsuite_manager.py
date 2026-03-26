@@ -66,15 +66,10 @@ class ROCmModularSuite:
         out.append(f"Status: {msg_color}{self._current_msg:<60}{Colors.ENDC}")
         out.append("-" * 85)
         
-        # Fixed-width formatting for index, name, and status
         for idx in sorted(self.tests.keys(), key=int):
             name = self.tests[idx]
             res = self.results[idx]
             color = Colors.OKGREEN if "Passed" in res else Colors.FAIL if "Failed" in res else Colors.OKBLUE if "Running" in res else Colors.WARNING
-            
-            # [idx:>2] right-aligns index to 2 chars: [ 1] vs [10]
-            # name:<25 pads test name to 25 chars
-            # res:<25 pads status to 25 chars
             out.append(f" [{idx:>2}] {name:<30} {color}{res:<25}{Colors.ENDC}")
         
         out.append("-" * 85)

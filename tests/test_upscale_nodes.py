@@ -2,7 +2,7 @@ import torch
 import torch.nn.functional as F
 
 def run():
-    print(">> Testing ComfyUI Upscale Kernels Verbose...")
+    print(">> Testing ComfyUI Upscale Kernels...")
     print("Config: Mode=Nearest-Exact, Factor=8x (64->512)")
     
     try:

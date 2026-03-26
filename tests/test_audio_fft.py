@@ -2,8 +2,7 @@ import torch
 import time
 
 def run():
-    print(">> Testing Signal Processing (rocFFT) Verbose...")
-    # 1-second 44.1kHz Buffer
+    print(">> Testing Signal Processing (rocFFT)...")
     length = 44100
     print(f"Config: Len={length} | Mode: Complex64")
     

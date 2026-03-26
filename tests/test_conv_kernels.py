@@ -3,8 +3,7 @@ import torch.nn as nn
 import time
 
 def run():
-    print(">> Testing Convolutional Kernels (MIOpen) Verbose...")
-    # Standard SDXL ResNet block: 320 channels, 3x3 kernel
+    print(">> Testing Convolutional Kernels (MIOpen)...")
     channels, res = 320, 64
     print(f"Config: Conv2d({channels}, {channels}, kernel=3) | Mode: FP16")
     

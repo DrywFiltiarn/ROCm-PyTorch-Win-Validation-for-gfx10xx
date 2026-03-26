@@ -2,7 +2,7 @@ import torch
 import time
 
 def run():
-    print(">> Testing VRAM Efficiency & Allocator Stability Verbose...")
+    print(">> Testing VRAM Efficiency & Allocator Stability...")
     print("Config: Cycle=500, Shape=Random[256-1024], Mode=FP32")
     
     try:

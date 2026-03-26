@@ -2,8 +2,7 @@ import torch
 import time
 
 def run():
-    # Standard header for the analyzer
-    print(">> Testing Sustained Workload (Thermal/Clock Stability) Verbose...")
+    print(">> Testing Sustained Workload (Thermal/Clock Stability)...")
     
     duration_sec = 30 
     print(f"Config: Continuous Loop | Duration: {duration_sec}s | Mode: High-Power GEMM")
@@ -20,20 +19,17 @@ def run():
             _ = torch.matmul(a, b)
             iterations += 1
             if iterations % 100 == 0:
-                # Brief sync to keep driver responsive
                 torch.cuda.synchronize()
         
         torch.cuda.synchronize()
         total_time = time.time() - start_time
         avg_latency = (total_time / iterations) * 1000
 
-        # Standardized Output Statistics block
         print("Output Statistics:")
         print(f" - Total Iterations: {iterations}")
         print(f" - Avg Kernel Latency: {avg_latency:.4f}ms")
-        print(f" - Status: Pass") # Added 'Pass' keyword for analyzer
+        print(f" - Status: Pass")
 
-        # Final health check and standardized success marker
         if iterations > 0:
             print(f"✅ Sustained workload verified.")
             return True

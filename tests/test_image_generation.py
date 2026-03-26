@@ -5,7 +5,7 @@ import time
 import os
 
 def run():
-    print(">> Testing Generative Image Pipeline + Disk I/O Verbose...")
+    print(">> Testing Generative Image Pipeline + Disk I/O...")
     steps = 20
     output_path = os.path.join("logs", "test_output_image.png")
     
@@ -28,7 +28,6 @@ def run():
             latent = latent * 0.9 + unet(latent) * 0.1
             
         print("--- Finalizing VAE Decode (Modern Autocast) ---")
-        # Updated syntax to resolve FutureWarning
         with torch.amp.autocast('cuda', enabled=False):
             image = vae.float()(latent.float())
             
