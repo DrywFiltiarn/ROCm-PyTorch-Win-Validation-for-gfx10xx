@@ -12,17 +12,18 @@ def analyze_logs():
     log_files = [f for f in os.listdir(log_dir) if f.endswith('.log')]
     
     # --- LIVE HARDWARE DISCOVERY ---
-    device_name = "Unknown AMD GPU"
-    gfx_arch = "10.1.0" 
+    device_name = "Unknown"
+    gfx_arch = "Unknown"
+    gfx_arch_code = "unknown"
     
     if torch.cuda.is_available():
         device_name = torch.cuda.get_device_name(0)
         if any(x in device_name for x in ["5700", "5600", "5500"]):
             gfx_arch = "10.1.0"
+            gfx_arch_code = "gfx1010"
         elif any(x in device_name for x in ["6900", "6800", "6700", "6600"]):
             gfx_arch = "10.3.0"
-        elif any(x in device_name for x in ["7900", "7800", "7700", "7600"]):
-            gfx_arch = "11.0.0"
+            gfx_arch_code = "gfx1030"
 
     evidence = {
         "cudnn_fail": False,
@@ -92,29 +93,23 @@ def analyze_logs():
     print("="*75)
     print(f"OVERALL HEALTH: {total_passed}/{len(log_files)} Tests Passed")
 
-    print("\n--- MANDATORY BASELINE (Hardware Native) ---")
-    print(f" ✅ HSA_OVERRIDE_GFX_VERSION={gfx_arch}")
-    print(f"    - Status: Standard baseline for {device_name}.")
-    print(" ✅ --use-pytorch-cross-attention")
-    print("    - Status: Standard. Essential for SDPA stability on RDNA hardware.")
-    print(" ✅ --preview-method auto")
-    print(f"    - Status: Standard. Optimizes VRAM-to-UI dispatch for {device_name}.")
+    print( "\n--- MANDATORY ENVIRONMENT VARIABLES ---")
+    print( " ✅ MIOPEN_FIND_MODE=3")
+    print( "     : Accelerate MIOpen API calls in hybrid mode")
+    print(f" ✅ PYTORCH_ROCM_ARCH={gfx_arch_code}")
+    print(f"     : Ensure correct arch is activated for {device_name}.")
+    print( " ✅ PYTORCH_HIP_ALLOC_CONF=expandable_segments:True,max_split_size_mb:128,garbage_collection_threshold:0.8")
+    print( "     : Improve memory handling under stress")
 
-    print("\n--- CONDITIONAL ADJUSTMENTS (Result-Dependent) ---")
-    if evidence["cudnn_fail"]:
-        print(" 🛠️  MIOPEN_DEBUG_DISABLE_CUDNN_CONVOLV=1")
-        print("    - REASON: Log confirms MIOpen instability and recovery via Native C++ Kernels.")
-    if evidence["vram_stress"]:
-        print(" 🛠️  PYTORCH_HIP_ALLOC_CONF=max_split_size_mb:128")
-        print("    - REASON: Telemetry indicates fragmentation risk during high-load or bus stress.")
-    if evidence["fp16_collapse"]:
-        print(" 🛠️  --no-half-vae --precision full")
-        print("    - REASON: Logs verified NaN/Inf collapse in half-precision generative paths.")
-    if evidence["gpu_spectral_works"]:
-        print(" 🛠️  Node-Level Logic: .abs() / Magnitude Sanitization")
-        print("    - REASON: Forensic audit proved GPU is stable with non-negative inputs.")
+    print( "\n--- MANDATORY COMFYUI ARGUMENTS ---")
+    print( " ✅ --use-pytorch-cross-attention")
+    print( "     : Essential for SDPA stability on RDNA hardware.")
+    print( " ✅ --preview-method auto")
+    print(f"     : Optimizes VRAM-to-UI dispatch for {device_name}.")
+    print( " ✅ --no-half-vae --precision full")
+    print( "     : RDNA1/RDNA2 do not handle half precision FP16 very well, enforce FP32")
+    print( "\n--- FINAL SYSTEM VERDICT ---")
 
-    print("\n--- FINAL SYSTEM VERDICT ---")
     if total_passed == len(log_files):
         print(f"STATUS: SYSTEM READY ({device_name})")
     else:
