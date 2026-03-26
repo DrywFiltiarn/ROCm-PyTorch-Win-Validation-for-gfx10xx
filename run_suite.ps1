@@ -1,3 +1,7 @@
+param(
+    [switch]$Unattended
+)
+
 Write-Host "=== Initializing ROCm Validation Environment ===" -ForegroundColor Cyan
 
 $env:MIOPEN_FIND_MODE = "3"
@@ -13,9 +17,13 @@ if (Test-Path $VenvPath) {
 }
 
 Write-Host ">> Starting Testsuite Manager..." -ForegroundColor Green
-python .\testsuite_manager.py
+if ($Unattended) {
+    python .\testsuite_manager.py --unattended
+} else {
+    python .\testsuite_manager.py
+}
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "`nTestsuite exited with an error (Code: $LASTEXITCODE)" -ForegroundColor Red
-    Pause
+    if (-not $Unattended) { Pause }
 }

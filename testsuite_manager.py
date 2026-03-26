@@ -52,7 +52,7 @@ class ROCmModularSuite:
         self.results = {idx: "Pending" for idx in self.tests}
         self._current_msg = "Suite reloaded. Statuses reset."
 
-    def display_menu(self):
+    def display_menu(self, unattended=False):
         os.system('cls')
         vram, mem = self.get_mem_info()
         
@@ -73,19 +73,20 @@ class ROCmModularSuite:
             out.append(f" [{idx:>2}] {name:<30} {color}{res:<25}{Colors.ENDC}")
         
         out.append("-" * 85)
-        out.append(f"{Colors.BOLD}[A] Run All (Silent)  [S] Save Summary  [R] Reload/Reset  [L] Clear Logs  [Q] Quit{Colors.ENDC}")
-        out.append("Selection: ")
+        if not unattended:
+            out.append(f"{Colors.BOLD}[A] Run All  [S] Save Summary  [R] Reload/Reset  [L] Clear Logs  [Q] Quit{Colors.ENDC}")
+            out.append("Selection: ")
         
         sys.stdout.write("\n".join(out))
         sys.stdout.flush()
 
-    def execute_test(self, idx, silent=False):
+    def execute_test(self, idx, silent=False, unattended=False):
         test_name = self.tests[idx]
         module_name = f"{self.test_dir}.{test_name}"
         log_path = os.path.join(self.log_dir, f"{test_name}.log")
         
         self.results[idx] = "Running..."
-        self.display_menu()
+        self.display_menu(unattended)
         
         start_time = time.time()
         success = False
@@ -104,7 +105,7 @@ class ROCmModularSuite:
         self.results[idx] = f"{'Passed' if success else 'Failed'} ({duration:.2f}s)"
 
         if not silent:
-            self.display_menu()
+            self.display_menu(unattended)
             print(f"\n{Colors.BOLD}--- LOG: {test_name}.log ---{Colors.ENDC}")
             try:
                 with open(log_path, "r", encoding="utf-8") as f: print(f.read())
@@ -128,27 +129,37 @@ class ROCmModularSuite:
             f.write("-" * 55 + "\n")
         self._current_msg = "Summary saved to logs/"
 
-    def run(self):
+    def run(self, unattended=False):
+        if unattended:
+            self._current_msg = "Running unattended batch validation..."
+            for idx in sorted(self.tests.keys(), key=int):
+                self.execute_test(idx, silent=True, unattended=unattended)
+            self.save_summary(); self.display_menu(unattended)
+            
+            has_failures = any("Failed" in res for res in self.results.values())
+            sys.exit(1 if has_failures else 0)
+
         while True:
-            self.display_menu()
+            self.display_menu(unattended)
             choice = input().upper()
             if choice == 'Q': break
             elif choice == 'R': self.refresh_tests()
-            elif choice == 'S': self.save_summary(); self.display_menu()
+            elif choice == 'S': self.save_summary(); self.display_menu(unattended)
             elif choice == 'L':
                 for f in os.listdir(self.log_dir): os.remove(os.path.join(self.log_dir, f))
                 self._current_msg = "Logs cleared."
             elif choice == 'A':
                 self._current_msg = "Running batch validation..."
                 for idx in sorted(self.tests.keys(), key=int):
-                    self.execute_test(idx, silent=True)
+                    self.execute_test(idx, silent=True, unattended=unattended)
                 self.save_summary()
                 self._current_msg = "Batch Complete. Reports saved."
-                self.display_menu()
+                self.display_menu(unattended)
             elif choice in self.tests:
-                self.execute_test(choice, silent=False)
+                self.execute_test(choice, silent=False, unattended=unattended)
 
 if __name__ == "__main__":
     if os.name == 'nt': os.system('chcp 65001 > nul')
     suite = ROCmModularSuite()
-    suite.run()
+    is_unattended = "--unattended" in sys.argv
+    suite.run(unattended=is_unattended)
