@@ -11,7 +11,11 @@ $env:PYTORCH_HIP_ALLOC_CONF = "expandable_segments:True,max_split_size_mb:128,ga
 $VenvPath = ".\venv\Scripts\Activate.ps1"
 if (Test-Path $VenvPath) {
     Write-Host ">> Activating Virtual Environment..." -ForegroundColor Yellow
-    & $VenvPath
+    try {
+        & $VenvPath -ErrorAction SilentlyContinue
+    } catch {
+        Write-Host ">> Virtual Environment activation encountered a minor issue, continuing..." -ForegroundColor Gray
+    }
 } else {
     Write-Host ">> WARNING: venv not found at $VenvPath. Running with system python." -ForegroundColor Red
 }

@@ -76,6 +76,8 @@ class ROCmModularSuite:
         if not unattended:
             out.append(f"{Colors.BOLD}[A] Run All  [S] Save Summary  [R] Reload/Reset  [L] Clear Logs  [Q] Quit{Colors.ENDC}")
             out.append("Selection: ")
+        else:
+            out.append("")
         
         sys.stdout.write("\n".join(out))
         sys.stdout.flush()
